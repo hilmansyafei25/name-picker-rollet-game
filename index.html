@@ -367,13 +367,11 @@
             
             // Show random names while spinning
             let spinInterval;
-            let counter = 0;
             rouletteWheel.classList.add('spinning');
             
             spinInterval = setInterval(() => {
                 const randomIndex = Math.floor(Math.random() * names.length);
                 rouletteContent.textContent = names[randomIndex];
-                counter++;
             }, 100);
             
             // Stop after 3 seconds and show winner
