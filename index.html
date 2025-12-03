@@ -1,0 +1,401 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Name Picker Roulette Game</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .container {
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            max-width: 800px;
+            width: 100%;
+        }
+
+        h1 {
+            text-align: center;
+            color: #667eea;
+            margin-bottom: 30px;
+            font-size: 2.5em;
+        }
+
+        .input-section {
+            margin-bottom: 30px;
+        }
+
+        .input-group {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        input[type="text"] {
+            flex: 1;
+            padding: 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            font-size: 16px;
+            transition: border-color 0.3s;
+        }
+
+        input[type="text"]:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        button {
+            padding: 15px 30px;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .btn-add {
+            background: #667eea;
+            color: white;
+        }
+
+        .btn-add:hover {
+            background: #5568d3;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-start {
+            background: #48bb78;
+            color: white;
+            width: 100%;
+            padding: 20px;
+            font-size: 20px;
+            margin-top: 20px;
+        }
+
+        .btn-start:hover:not(:disabled) {
+            background: #38a169;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(72, 187, 120, 0.4);
+        }
+
+        .btn-start:disabled {
+            background: #cbd5e0;
+            cursor: not-allowed;
+        }
+
+        .btn-remove {
+            background: #f56565;
+            color: white;
+            padding: 8px 15px;
+            font-size: 14px;
+        }
+
+        .btn-remove:hover {
+            background: #e53e3e;
+        }
+
+        .names-list {
+            margin-bottom: 20px;
+        }
+
+        .names-list h3 {
+            color: #4a5568;
+            margin-bottom: 15px;
+        }
+
+        .name-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 15px;
+            background: #f7fafc;
+            border-radius: 8px;
+            margin-bottom: 10px;
+            transition: all 0.3s;
+        }
+
+        .name-item:hover {
+            background: #edf2f7;
+            transform: translateX(5px);
+        }
+
+        .name-text {
+            font-size: 16px;
+            color: #2d3748;
+        }
+
+        .roulette-section {
+            text-align: center;
+            margin-top: 30px;
+        }
+
+        .roulette-wheel {
+            width: 300px;
+            height: 300px;
+            margin: 20px auto;
+            border-radius: 50%;
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            transition: transform 0.1s;
+        }
+
+        .roulette-wheel.spinning {
+            animation: spin 3s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+        }
+
+        @keyframes spin {
+            0% {
+                transform: rotate(0deg);
+            }
+            100% {
+                transform: rotate(1800deg);
+            }
+        }
+
+        .roulette-content {
+            background: white;
+            width: 250px;
+            height: 250px;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 24px;
+            font-weight: bold;
+            color: #667eea;
+            padding: 20px;
+            word-wrap: break-word;
+            text-align: center;
+        }
+
+        .winner-announcement {
+            margin-top: 30px;
+            padding: 20px;
+            background: linear-gradient(135deg, #ffd700, #ffed4e);
+            border-radius: 15px;
+            display: none;
+        }
+
+        .winner-announcement.show {
+            display: block;
+            animation: fadeIn 0.5s;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .winner-announcement h2 {
+            color: #744210;
+            margin-bottom: 10px;
+        }
+
+        .winner-name {
+            font-size: 32px;
+            font-weight: bold;
+            color: #744210;
+        }
+
+        .empty-message {
+            text-align: center;
+            color: #a0aec0;
+            padding: 20px;
+            font-style: italic;
+        }
+
+        @media (max-width: 600px) {
+            .container {
+                padding: 20px;
+            }
+
+            h1 {
+                font-size: 2em;
+            }
+
+            .roulette-wheel {
+                width: 250px;
+                height: 250px;
+            }
+
+            .roulette-content {
+                width: 200px;
+                height: 200px;
+                font-size: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🎰 Name Picker Roulette</h1>
+        
+        <div class="input-section">
+            <div class="input-group">
+                <input 
+                    type="text" 
+                    id="nameInput" 
+                    placeholder="Masukkan nama..." 
+                    onkeypress="if(event.key === 'Enter') addName()"
+                >
+                <button class="btn-add" onclick="addName()">Tambah</button>
+            </div>
+        </div>
+
+        <div class="names-list">
+            <h3>Daftar Nama (<span id="nameCount">0</span>)</h3>
+            <div id="namesList"></div>
+        </div>
+
+        <button class="btn-start" id="startBtn" onclick="startRoulette()" disabled>
+            🎲 Mulai Roulette
+        </button>
+
+        <div class="roulette-section">
+            <div class="roulette-wheel" id="rouletteWheel">
+                <div class="roulette-content" id="rouletteContent">
+                    Siap!
+                </div>
+            </div>
+        </div>
+
+        <div class="winner-announcement" id="winnerAnnouncement">
+            <h2>🎉 Pemenangnya adalah:</h2>
+            <div class="winner-name" id="winnerName"></div>
+        </div>
+    </div>
+
+    <script>
+        let names = [];
+        let isSpinning = false;
+
+        function updateNamesList() {
+            const namesList = document.getElementById('namesList');
+            const nameCount = document.getElementById('nameCount');
+            const startBtn = document.getElementById('startBtn');
+            
+            nameCount.textContent = names.length;
+            
+            if (names.length === 0) {
+                namesList.innerHTML = '<div class="empty-message">Belum ada nama. Tambahkan nama terlebih dahulu.</div>';
+                startBtn.disabled = true;
+            } else {
+                namesList.innerHTML = names.map((name, index) => `
+                    <div class="name-item">
+                        <span class="name-text">${name}</span>
+                        <button class="btn-remove" onclick="removeName(${index})">Hapus</button>
+                    </div>
+                `).join('');
+                startBtn.disabled = false;
+            }
+        }
+
+        function addName() {
+            const input = document.getElementById('nameInput');
+            const name = input.value.trim();
+            
+            if (name === '') {
+                alert('Nama tidak boleh kosong!');
+                return;
+            }
+            
+            if (names.includes(name)) {
+                alert('Nama sudah ada dalam daftar!');
+                return;
+            }
+            
+            names.push(name);
+            input.value = '';
+            input.focus();
+            updateNamesList();
+            hideWinner();
+        }
+
+        function removeName(index) {
+            names.splice(index, 1);
+            updateNamesList();
+            hideWinner();
+        }
+
+        function hideWinner() {
+            document.getElementById('winnerAnnouncement').classList.remove('show');
+        }
+
+        function startRoulette() {
+            if (isSpinning || names.length === 0) {
+                return;
+            }
+            
+            isSpinning = true;
+            const startBtn = document.getElementById('startBtn');
+            const rouletteWheel = document.getElementById('rouletteWheel');
+            const rouletteContent = document.getElementById('rouletteContent');
+            const winnerAnnouncement = document.getElementById('winnerAnnouncement');
+            const winnerName = document.getElementById('winnerName');
+            
+            startBtn.disabled = true;
+            winnerAnnouncement.classList.remove('show');
+            
+            // Show random names while spinning
+            let spinInterval;
+            rouletteWheel.classList.add('spinning');
+            
+            spinInterval = setInterval(() => {
+                const randomIndex = Math.floor(Math.random() * names.length);
+                rouletteContent.textContent = names[randomIndex];
+            }, 100);
+            
+            // Stop after 3 seconds and show winner
+            setTimeout(() => {
+                clearInterval(spinInterval);
+                rouletteWheel.classList.remove('spinning');
+                
+                // Select final winner
+                const winnerIndex = Math.floor(Math.random() * names.length);
+                const winner = names[winnerIndex];
+                
+                setTimeout(() => {
+                    rouletteContent.textContent = winner;
+                    winnerName.textContent = winner;
+                    winnerAnnouncement.classList.add('show');
+                    
+                    isSpinning = false;
+                    startBtn.disabled = false;
+                }, 500);
+            }, 3000);
+        }
+
+        // Initialize
+        updateNamesList();
+    </script>
+</body>
+</html>
