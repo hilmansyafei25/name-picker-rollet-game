@@ -71,6 +71,44 @@
             border-color: #667eea;
         }
 
+        textarea {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            font-size: 16px;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            transition: border-color 0.3s;
+            resize: vertical;
+            min-height: 120px;
+        }
+
+        textarea:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .bulk-input-section {
+            display: none;
+            margin-bottom: 20px;
+        }
+
+        .bulk-input-section.active {
+            display: block;
+        }
+
+        .toggle-input-mode {
+            background: #764ba2;
+            color: white;
+            padding: 10px 20px;
+            font-size: 14px;
+            margin-bottom: 15px;
+        }
+
+        .toggle-input-mode:hover {
+            background: #653a8a;
+        }
+
         button {
             padding: 15px 30px;
             border: none;
@@ -363,7 +401,11 @@
         <h1><span class="dice-emoji">🎲</span> Name Picker Dice</h1>
         
         <div class="input-section">
-            <div class="input-group">
+            <button class="toggle-input-mode" onclick="toggleInputMode()">
+                <span id="toggleButtonText">📝 Tambah Banyak Nama Sekaligus</span>
+            </button>
+            
+            <div class="input-group" id="singleInputGroup">
                 <input 
                     type="text" 
                     id="nameInput" 
@@ -371,6 +413,14 @@
                     onkeypress="if(event.key === 'Enter') addName()"
                 >
                 <button class="btn-add" onclick="addName()">Tambah</button>
+            </div>
+            
+            <div class="bulk-input-section" id="bulkInputSection">
+                <textarea 
+                    id="bulkNameInput" 
+                    placeholder="Masukkan beberapa nama, pisahkan dengan baris baru (Enter)&#10;Contoh:&#10;Alice&#10;Bob&#10;Charlie"
+                ></textarea>
+                <button class="btn-add" onclick="addBulkNames()" style="width: 100%; margin-top: 10px;">Tambah Semua Nama</button>
             </div>
         </div>
 
@@ -466,6 +516,68 @@
 
         function hideWinner() {
             document.getElementById('winnerAnnouncement').classList.remove('show');
+        }
+
+        function toggleInputMode() {
+            const singleInputGroup = document.getElementById('singleInputGroup');
+            const bulkInputSection = document.getElementById('bulkInputSection');
+            const toggleButtonText = document.getElementById('toggleButtonText');
+            
+            if (bulkInputSection.classList.contains('active')) {
+                // Switch to single input mode
+                bulkInputSection.classList.remove('active');
+                singleInputGroup.style.display = 'flex';
+                toggleButtonText.textContent = '📝 Tambah Banyak Nama Sekaligus';
+            } else {
+                // Switch to bulk input mode
+                bulkInputSection.classList.add('active');
+                singleInputGroup.style.display = 'none';
+                toggleButtonText.textContent = '✏️ Tambah Nama Satu per Satu';
+            }
+        }
+
+        function addBulkNames() {
+            const bulkInput = document.getElementById('bulkNameInput');
+            const inputText = bulkInput.value.trim();
+            
+            if (inputText === '') {
+                alert('Harap masukkan setidaknya satu nama!');
+                return;
+            }
+            
+            // Split by newlines and filter out empty lines
+            const newNames = inputText.split('\n')
+                .map(name => name.trim())
+                .filter(name => name !== '');
+            
+            if (newNames.length === 0) {
+                alert('Tidak ada nama yang valid ditemukan!');
+                return;
+            }
+            
+            let addedCount = 0;
+            let duplicateCount = 0;
+            
+            newNames.forEach(name => {
+                if (!names.includes(name)) {
+                    names.push(name);
+                    addedCount++;
+                } else {
+                    duplicateCount++;
+                }
+            });
+            
+            bulkInput.value = '';
+            updateNamesList();
+            hideWinner();
+            
+            if (addedCount > 0 && duplicateCount > 0) {
+                alert(`Berhasil menambahkan ${addedCount} nama. ${duplicateCount} nama duplikat diabaikan.`);
+            } else if (addedCount > 0) {
+                alert(`Berhasil menambahkan ${addedCount} nama!`);
+            } else if (duplicateCount > 0) {
+                alert(`Semua ${duplicateCount} nama sudah ada dalam daftar!`);
+            }
         }
 
         function startDiceRoll() {
