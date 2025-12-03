@@ -197,6 +197,36 @@
             perspective: 1000px;
         }
 
+        .timer-display {
+            font-size: 48px;
+            font-weight: bold;
+            color: #667eea;
+            margin-bottom: 20px;
+            min-height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        .timer-display.active {
+            opacity: 1;
+        }
+
+        .timer-display .time {
+            animation: pulse 1s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% {
+                transform: scale(1);
+            }
+            50% {
+                transform: scale(1.2);
+            }
+        }
+
         .dice-container {
             width: 200px;
             height: 200px;
@@ -207,7 +237,7 @@
         }
 
         .dice-container.rolling {
-            animation: diceRoll 3s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+            animation: diceRoll 5s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
         }
 
         @keyframes diceRoll {
@@ -434,6 +464,9 @@
         </button>
 
         <div class="roulette-section">
+            <div class="timer-display" id="timerDisplay">
+                <span class="time"></span>
+            </div>
             <div class="dice-container" id="diceContainer">
                 <div class="dice-face front">
                     <div class="dice-content" id="diceFront">Siap!</div>
@@ -588,6 +621,7 @@
             isSpinning = true;
             const startBtn = document.getElementById('startBtn');
             const diceContainer = document.getElementById('diceContainer');
+            const timerDisplay = document.getElementById('timerDisplay');
             const diceFaces = {
                 front: document.getElementById('diceFront'),
                 back: document.getElementById('diceBack'),
@@ -602,6 +636,20 @@
             startBtn.disabled = true;
             winnerAnnouncement.classList.remove('show');
             
+            // Show and start timer
+            timerDisplay.classList.add('active');
+            let timeLeft = 5;
+            timerDisplay.querySelector('.time').textContent = timeLeft;
+            
+            const timerInterval = setInterval(() => {
+                timeLeft--;
+                if (timeLeft > 0) {
+                    timerDisplay.querySelector('.time').textContent = timeLeft;
+                } else {
+                    clearInterval(timerInterval);
+                }
+            }, 1000);
+            
             // Show random names on all faces while rolling
             let spinInterval;
             diceContainer.classList.add('rolling');
@@ -613,7 +661,7 @@
                 });
             }, 100);
             
-            // Stop after 3 seconds and show winner
+            // Stop after 5 seconds and show winner
             setTimeout(() => {
                 clearInterval(spinInterval);
                 diceContainer.classList.remove('rolling');
@@ -623,6 +671,9 @@
                 const winner = names[winnerIndex];
                 
                 setTimeout(() => {
+                    // Hide timer
+                    timerDisplay.classList.remove('active');
+                    
                     // Show winner on the front face
                     diceFaces.front.textContent = winner;
                     // Show random names on other faces
@@ -639,7 +690,7 @@
                     isSpinning = false;
                     startBtn.disabled = false;
                 }, 500);
-            }, 3000);
+            }, 5000);
         }
 
         // Initialize
